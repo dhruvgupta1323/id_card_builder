@@ -3,7 +3,7 @@ export interface BeachBagItem {
   label: string;
 }
 
-export type CardThemeId = 'classic_goa' | 'cyber_sunset' | 'emerald_hacker' | 'golden_palm';
+export type CardThemeId = 'classic_goa' | 'cyber_sunset' | 'emerald_hacker' | 'golden_palm' | 'tropical_vibes';
 
 export interface CardTheme {
   id: CardThemeId;
@@ -50,11 +50,11 @@ export const AVAILABLE_BEACH_BAG_ITEMS: BeachBagItem[] = [
 ];
 
 export const DEFAULT_PROFILE: BuilderProfile = {
-  name: 'MADHAVAN SINGH',
-  role: 'FULL STACK DEVELOPER',
-  stack: 'Next.js • React • Node.js',
-  builderTitle: 'TERMINAL WIZARD',
-  motto: 'BUILDING THE FUTURE',
+  name: '',
+  role: '',
+  stack: '',
+  builderTitle: '',
+  motto: '',
   photoUrl: null,
   photoScale: 1.0,
   photoOffsetX: 0,
