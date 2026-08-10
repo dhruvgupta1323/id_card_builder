@@ -139,25 +139,27 @@ export async function drawCardOnCanvas(
   // ─────────────────────────────────────────────────────────────
   // 6. NAME PLATE  (y = 680..750)
   // ─────────────────────────────────────────────────────────────
-  const npW = 720, npH = 72, npX = 540 - npW / 2, npY = 685;
+  const npW = 720, npH = 76, npX = 540 - npW / 2, npY = 683;
 
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,0.2)';
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 5;
-  roundRect(ctx, npX, npY, npW, npH, 18, '#FFDF00', theme.nameBgColor, 4);
+  ctx.shadowColor = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 6;
+  roundRect(ctx, npX, npY, npW, npH, 20, '#FFDF00', theme.nameBgColor, 5);
 
-  // Inner thin line
+  // Inner shimmer line
   ctx.shadowColor = 'transparent';
-  roundRect(ctx, npX + 7, npY + 7, npW - 14, npH - 14, 12, 'rgba(255,223,0,0.35)', null, 1.5);
+  roundRect(ctx, npX + 8, npY + 8, npW - 16, npH - 16, 14, 'rgba(255,255,255,0.12)', null, 1.5);
 
-  ctx.fillStyle = theme.nameTextColor;
+  const displayName = profile.name.trim() || 'YOUR NAME HERE';
+  const nameStr = `✦  ${displayName.toUpperCase()}  ✦`;
+  // If placeholder, render it dimmed
+  ctx.fillStyle = profile.name.trim() ? theme.nameTextColor : 'rgba(255,255,255,0.4)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const nameStr = `✦  ${profile.name.toUpperCase()}  ✦`;
   let nfs = 36;
   ctx.font = `900 ${nfs}px Inter, "Arial Black", sans-serif`;
-  while (ctx.measureText(nameStr).width > npW - 44 && nfs > 20) {
+  while (ctx.measureText(nameStr).width > npW - 50 && nfs > 18) {
     nfs -= 2;
     ctx.font = `900 ${nfs}px Inter, "Arial Black", sans-serif`;
   }
@@ -167,16 +169,21 @@ export async function drawCardOnCanvas(
   // ─────────────────────────────────────────────────────────────
   // 7. ROLE PILL  (y = 768..822)
   // ─────────────────────────────────────────────────────────────
-  const rpW = 580, rpH = 54, rpX = 540 - rpW / 2, rpY = 772;
+  const rpW = 580, rpH = 54, rpX = 540 - rpW / 2, rpY = 774;
   roundRect(ctx, rpX, rpY, rpW, rpH, 27, theme.borderColor, theme.roleBgColor, 3);
+  // Inner border for depth
+  roundRect(ctx, rpX + 5, rpY + 5, rpW - 10, rpH - 10, 23, 'rgba(255,255,255,0.15)', null, 1);
   ctx.save();
-  ctx.fillStyle = theme.roleTextColor;
+  const displayRole = profile.role.trim() || 'YOUR ROLE / STACK';
+  // Ensure contrast: if role bg is light yellow (#FFB800), use dark text; else use theme.roleTextColor
+  const roleLum = theme.roleBgColor === '#FFB800' || theme.roleBgColor === '#F59E0B' ? '#1A0A00' : theme.roleTextColor;
+  ctx.fillStyle = profile.role.trim() ? roleLum : 'rgba(0,0,0,0.35)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const roleStr = `⚡  ${profile.role.toUpperCase()}  ⚡`;
-  let rfs = 25;
+  const roleStr = `⚡  ${displayRole.toUpperCase()}  ⚡`;
+  let rfs = 24;
   ctx.font = `900 ${rfs}px Inter, "Arial Black", sans-serif`;
-  while (ctx.measureText(roleStr).width > rpW - 32 && rfs > 14) {
+  while (ctx.measureText(roleStr).width > rpW - 36 && rfs > 13) {
     rfs -= 1;
     ctx.font = `900 ${rfs}px Inter, "Arial Black", sans-serif`;
   }
@@ -200,16 +207,17 @@ export async function drawCardOnCanvas(
   colHeader(ctx, c1x + colInner / 2, secY + 28, '✦ BUILDER CLASS ✦', theme.hindiTextColor);
 
   ctx.save();
-  ctx.fillStyle = theme.headerTextColor;
+  const displayTitle = profile.builderTitle.trim() || 'YOUR TITLE';
+  ctx.fillStyle = profile.builderTitle.trim() ? theme.headerTextColor : 'rgba(0,0,0,0.3)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   let btfs = 22;
   ctx.font = `900 ${btfs}px Inter, "Arial Black", sans-serif`;
-  while (ctx.measureText(profile.builderTitle.toUpperCase()).width > colInner - 10 && btfs > 14) {
+  while (ctx.measureText(displayTitle.toUpperCase()).width > colInner - 10 && btfs > 13) {
     btfs--;
     ctx.font = `900 ${btfs}px Inter, "Arial Black", sans-serif`;
   }
-  ctx.fillText(profile.builderTitle.toUpperCase(), c1x + colInner / 2, secY + 72);
+  ctx.fillText(displayTitle.toUpperCase(), c1x + colInner / 2, secY + 72);
   ctx.restore();
 
   // Real scannable QR code
@@ -236,17 +244,19 @@ export async function drawCardOnCanvas(
   bagItems.slice(0, 3).forEach((item, i) => {
     const iy = secY + 80 + i * 62;
 
-    // pill background
+    // pill background with subtle fill
     ctx.save();
-    roundRect(ctx, c2x + 16, iy - 20, colInner - 32, 48, 12, theme.accentColor + '33', null, 0);
-    ctx.font = '26px sans-serif';
+    roundRect(ctx, c2x + 14, iy - 22, colInner - 28, 50, 12, theme.accentColor + '55', theme.bgColor, 1.5);
+    // emoji
+    ctx.font = '24px sans-serif';
     ctx.textBaseline = 'middle';
-    ctx.fillText(item.icon, c2x + 36, iy + 4);
-
-    ctx.fillStyle = theme.headerTextColor;
-    ctx.font = '800 18px Inter, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(item.label.toUpperCase(), c2x + 72, iy + 4);
+    ctx.fillText(item.icon, c2x + 30, iy + 4);
+    // label — use headerTextColor which is always dark on light bg themes
+    ctx.fillStyle = theme.headerTextColor;
+    ctx.font = '800 17px Inter, "Arial Black", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(item.label.toUpperCase(), c2x + 68, iy + 4);
     ctx.restore();
   });
 
@@ -257,16 +267,26 @@ export async function drawCardOnCanvas(
   colHeader(ctx, c3x + colInner / 2, secY + 28, '✦ CURRENTLY SHIPPING ✦', theme.hindiTextColor);
 
   ctx.save();
-  ctx.fillStyle = theme.hindiTextColor;
+  const displayMotto = profile.motto.trim() || 'YOUR MOTTO';
+  ctx.fillStyle = profile.motto.trim() ? theme.hindiTextColor : 'rgba(0,0,0,0.3)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   let mfs = 20;
   ctx.font = `900 ${mfs}px Inter, "Arial Black", sans-serif`;
-  while (ctx.measureText(profile.motto.toUpperCase()).width > colInner - 12 && mfs > 12) {
+  const mottoLines = wrapText(displayMotto.toUpperCase(), colInner - 16, mfs);
+  while (mfs > 12) {
+    const lines = wrapText(displayMotto.toUpperCase(), colInner - 16, mfs);
+    if (lines.every(l => {
+      ctx.font = `900 ${mfs}px Inter, "Arial Black", sans-serif`;
+      return ctx.measureText(l).width <= colInner - 16;
+    })) break;
     mfs--;
-    ctx.font = `900 ${mfs}px Inter, "Arial Black", sans-serif`;
   }
-  ctx.fillText(profile.motto.toUpperCase(), c3x + colInner / 2, secY + 72);
+  ctx.font = `900 ${mfs}px Inter, "Arial Black", sans-serif`;
+  const mLines = wrapText(displayMotto.toUpperCase(), colInner - 16, mfs);
+  mLines.slice(0, 2).forEach((line, li) => {
+    ctx.fillText(line, c3x + colInner / 2, secY + 62 + li * (mfs + 8));
+  });
   ctx.restore();
 
   // Wave divider
@@ -574,14 +594,31 @@ function drawAvatarPlaceholder(
   ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, theme: any
 ) {
   ctx.save();
+  // Dark base fill
   ctx.fillStyle = '#1A2540';
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = theme.accentColor;
-  ctx.beginPath(); ctx.arc(cx, cy - 30, 58, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(cx, cy + 110, 110, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#FFFFFF'; ctx.font = '800 20px Inter, sans-serif';
+
+  // Silhouette head
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); ctx.arc(cx, cy - 38, 62, 0, Math.PI * 2); ctx.fill();
+  // Silhouette body
+  ctx.beginPath(); ctx.arc(cx, cy + 120, 118, 0, Math.PI * 2); ctx.fill();
+
+  // Camera icon circle — contrasting pill
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.beginPath(); ctx.roundRect(cx - 110, cy + 16, 220, 52, 26); ctx.fill();
+  // Camera emoji
+  ctx.font = '22px sans-serif';
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+  ctx.fillText('📷', cx - 95, cy + 42);
+  // Text — always white on the dark pill
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '700 18px Inter, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('TAP TO UPLOAD PHOTO', cx, cy + 28);
+  ctx.fillText('TAP TO UPLOAD PHOTO', cx + 14, cy + 42);
+  ctx.restore();
+
   ctx.restore();
 }
 
@@ -599,10 +636,38 @@ function drawVertText(
 
 function colHeader(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string) {
   ctx.save();
-  ctx.fillStyle = color; ctx.font = '900 14px Inter, "Arial Black", sans-serif';
+  // Draw a subtle pill background so the header text always has contrast
+  const tw = ctx.measureText(text).width + 24;
+  ctx.fillStyle = color + '20';
+  ctx.beginPath(); ctx.roundRect(x - tw / 2, y - 17, tw, 22, 11); ctx.fill();
+  ctx.fillStyle = color;
+  ctx.font = '900 13px Inter, "Arial Black", sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
   ctx.fillText(text, x, y);
   ctx.restore();
+}
+
+// Utility: simple word-wrap returning lines
+function wrapText(text: string, maxWidth: number, fontSize: number): string[] {
+  // Approximation: ~0.6 * fontSize per char avg
+  const avgCharW = fontSize * 0.58;
+  const charsPerLine = Math.floor(maxWidth / avgCharW);
+  if (!text) return [''];
+  if (text.length <= charsPerLine) return [text];
+  // Try to break at spaces
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let cur = '';
+  words.forEach(w => {
+    if ((cur + ' ' + w).trim().length <= charsPerLine) {
+      cur = (cur + ' ' + w).trim();
+    } else {
+      if (cur) lines.push(cur);
+      cur = w;
+    }
+  });
+  if (cur) lines.push(cur);
+  return lines.length ? lines : [text];
 }
 
 function dottedLine(ctx: CanvasRenderingContext2D, x: number, y: number, h: number, color: string) {
