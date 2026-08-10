@@ -8,6 +8,14 @@ The generated card can be downloaded as an image and shared on X with **#FrameIn
 
 ---
 
+
+## 🎥 Demo
+
+<p align="center">
+  <img src=" demo.gif" alt="HH Goa ID Builder Demo" width="900">
+</p>
+
+
 ## ✨ Features
 
 - 📸 Upload your profile photo
